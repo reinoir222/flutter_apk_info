@@ -46,6 +46,28 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Widget buildMain(BuildContext context) {
+    if (_reading){
+      return CircularProgressIndicator();
+    }
+    if (_info == null) {
+      return Text('Please select an .apk file.');
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_info!.iconData is Uint8List) Image.memory(_info!.iconData!, width: 64,),
+        Text('APK Info', style: TextStyle(fontWeight: FontWeight.bold),),
+        Text(
+            "appName = ${_info?.appName}\n"
+            "packageName = ${_info?.packageName}\n"
+            "version = ${_info?.version}\n"
+            "buildNumber = ${_info?.buildNumber}\n"
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -54,14 +76,8 @@ class _MyAppState extends State<MyApp> {
           title: const Text('FlutterApkInfo Example'),
         ),
         body: Center(
-          child: _reading
-              ? CircularProgressIndicator()
-              : Text(_info == null ? 'Please select an .apk file.' : 'APK Info:\n'
-                  "appName = ${_info?.appName}\n"
-                  "packageName = ${_info?.packageName}\n"
-                  "version = ${_info?.version}\n"
-                  "buildNumber = ${_info?.buildNumber}\n"),
-              ),
+          child: buildMain(context)
+        ),
         floatingActionButton: FloatingActionButton(
             onPressed: () async {
               FilePickerResult? result = await FilePicker.platform.pickFiles();

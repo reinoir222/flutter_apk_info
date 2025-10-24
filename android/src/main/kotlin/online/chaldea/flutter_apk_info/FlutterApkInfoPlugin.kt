@@ -11,6 +11,11 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.util.Base64
+import java.io.ByteArrayOutputStream
+
 /** FlutterApkInfoPlugin */
 class FlutterApkInfoPlugin: FlutterPlugin, MethodCallHandler {
   /// The MethodChannel that will the communication between Flutter and native Android
@@ -48,6 +53,13 @@ class FlutterApkInfoPlugin: FlutterPlugin, MethodCallHandler {
       map["packageName"] = info.packageName ?: ""
       map["version"] = info.versionName ?: ""
       map["buildNumber"] = getLongVersionCode(info).toString()
+      val icon = info.applicationInfo?.loadIcon(pm);
+      if (icon is BitmapDrawable) {
+        val bitmap = icon.bitmap
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        map["iconData"] = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP);
+      }
 
       result.success(map)
     } else {
