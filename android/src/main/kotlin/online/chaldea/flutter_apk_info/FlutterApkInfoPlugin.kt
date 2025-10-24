@@ -55,7 +55,11 @@ class FlutterApkInfoPlugin: FlutterPlugin, MethodCallHandler {
       map["buildNumber"] = getLongVersionCode(info).toString()
       val icon = info.applicationInfo?.loadIcon(pm);
       if (icon is BitmapDrawable) {
-        val bitmap = icon.bitmap
+        var bitmap = icon.bitmap
+        if (bitmap.width > 256 || bitmap.height > 256) {
+          val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 256, 256, true)
+          bitmap = scaledBitmap
+        }
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         map["iconData"] = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP);
